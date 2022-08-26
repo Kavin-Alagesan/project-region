@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-body">
+        <div class="text-center">
+            <h2>Region</h2>
+        </div>
+    </div>
+</div>
+<p></p>
+
+<!-- Message block -->
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-success text-center" role="alert">
+    {{ message }}</div>
+{% endfor %}
+{% endif %}
+<!-- End message block -->
+
+
+<div class="container">
+    <form name="formCreate" class="needs-validation" id="formCreateID" method="POST" action="{% url 'create' %}"
+        enctype="multipart/form-data" onsubmit="return validateForm()">
+        {% csrf_token %}
+        <div class="position-relative">
+            <div class="position-absolute top-0 end-0">
+                <label for="validationServer01" class="col-sm-3 text-center">Image</label>
+                <p></p>
+                <div class="col-sm-4">
+                    <div class="holder">
+                        <img id="imgPreview" src="media/default.jpg" width="150"
+                            height="100" />
+                        <input type="file" accept="image/*" name="fileImage" id="fileImage" width="75px" height="50px" required="true"
+                            value="{{return_img.image}}" />
+                    </div>
+                    <div class="invalid-feedback">
+                        Upload image!
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label for="validationServer01" class="col-sm-3 ">Region code</label>
+            <div class="col-sm-4" class="has-validation">
+                <input type="text" class="form-check-label form-control" name='txtRegionCode' id="txtRegionCode"
+                    value="{{return_data.code}}" required>
+                <div style="color:red;">{{response.code|join:""}}</div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label for="validationServer01" class="col-sm-3 ">Region Name</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-check-label form-control" name='txtRegionName' id="txtRegionName"
+                    value="{{return_data.name}}" >
+                <div style="color:red;">{{response.name|join:""}}</div>
+            </div>
+        </div>
+        <!-- <input type="" id="hidCountry" value="1"> -->
+        <div class="row mb-3">
+            <label for="validationServer01" class="col-sm-3">Country</label>
+            <div class="col-sm-4">
+                <select class="form-select" name="ddlCountry" id="ddlCountry" required aria-label="select example"
+                    required="required">
+                    <option value="0">Select country</option>
+                    <option value="1"{% if return_data.country == '1' %}selected{% endif %}>India</option>
+                    <option value="2"{% if return_data.country == '2' %}selected{% endif %}>USA</option>
+                    <option value="3"{% if return_data.country == '3' %}selected{% endif %}>Japan</option>
+                    <option value="4"{% if return_data.country == '4' %}selected{% endif %}>China</option>
+                    <option value="5"{% if return_data.country == '5' %}selected{% endif %}>Cambodia</option>
+                    <option value="6"{% if return_data.country == '6' %}selected{% endif %}>Rwanda</option>
+                    <option value="7"{% if return_data.country == '7' %}selected{% endif %}>Thailand</option>
+                </select>
+                <div style="color:red;">{{response.country|join:""}}</div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <div style="text-align:center">
+                <button class="btn btn-primary" id="btnSave" type="submit">Save</button>
+                <button class="btn btn-success" id="btnUpdate" style="display: None;" type="submit">Update</button>
+                <a href='{% url "create" %}' class="btn btn-primary" type="button">Cancel</button></a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- List regions -->
+<div class="container">
+    <table style="border:5px solid #000;" width="100%;">
+        <tbody>
+            <thead>
+                <tr>
+                    <th style="text-align:center">ID</th>
+                    <th style="text-align:center">Region code</th>
+                    <th style="text-align:center">Region name</th>
+                    <th style="text-align:center">Country</th>
+                    <th style="text-align:center">Image</th>
+                </tr>
+            </thead>
+        </tbody>
+        <tbody>
+            {% for data in data_list %}
+            <tr>
+                <td style="text-align:center">{{data.id}}</td>
+                <td style="text-align:center">{{data.code}}</td>
+                <td style="text-align:center">{{data.name}}</td>
+                <td style="text-align:center">{{data.country}}</td>
+                <td style="text-align:center"><img src="{{data.image}}" width="75" height="50"></td>
+                <td style="text-align:center">
+                    <button type="button" class="btn btn-primary" onclick="edit('{{data.id}}')">Edit</button>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                        data-bs-target="#RegionModalDelete{{data.id}}">Delete</button>
+                </td>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<!-- Button trigger modal to Delete -->
+{% for data in data_list %}
+<div class="modal fade" id="RegionModalDelete{{data.id}}" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" id="delete1" action="{% url 'delete' data.id %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Delete region details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure want to delete?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}
